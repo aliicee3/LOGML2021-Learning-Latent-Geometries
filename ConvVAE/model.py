@@ -104,7 +104,10 @@ class DecoderConv(nn.Module):
         self.dconv_up3 = residualBlock(size[2], size[2])
         self.dconv_up2 = residualBlock(size[2], size[1])
         self.dconv_up1 = residualBlock(size[1], size[0])
-        self.conv_last = nn.Conv2d(size[0], 3, 1)
+        
+        #self.conv_out = nn.Conv2d(size[0], 3, 1)
+        self.mu_last = nn.Conv2d(size[0], 3, 1)
+        self.logvar_last = nn.Conv2d(size[0], 3, 1)
         
     def forward(self, x):        
         x = self.fc(x)
@@ -119,9 +122,14 @@ class DecoderConv(nn.Module):
         
         x = self.upsample(x)
         x = self.dconv_up1(x)
-
-        out = self.conv_last(x)
-        return out
+        
+        #x = self.conv_out(x)
+        #return x
+        
+        mu = self.mu_last(x)
+        logvar = self.logvar_last(x)
+        
+        return mu, logvar
 
 class VariationalAutoencoder(nn.Module):
     def __init__(self, latents = 128, c = 4):
@@ -132,7 +140,12 @@ class VariationalAutoencoder(nn.Module):
     def forward(self, x):
         latent_mu, latent_logvar = self.encoder(x)
         latent = self.latent_sample(latent_mu, latent_logvar)
-        x_recon = self.decoder(latent)
+        
+        #x_recon = self.decoder(latent)
+
+        out_mu, out_logvar = self.decoder(latent)
+        x_recon = self.latent_sample(out_mu, out_logvar)
+        
         return x_recon, latent_mu, latent_logvar
     
     def latent_sample(self, mu, logvar):

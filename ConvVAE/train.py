@@ -72,7 +72,7 @@ print('Loading Model')
 model = VariationalAutoencoder(latents = LATENT_DIMS, c = 4).to(device)
 print(summary(model, torch.zeros((1, *data.shape[1:])).to(device), show_input=True))
 
-history_vae = train_vae(data, model.to(device), epochs=400, batch_size=4, lr=1e-4)
+history_vae = train_vae(data, model.to(device), epochs=500, batch_size=4, lr=1e-4)
 
 textfile = open("history.txt", "+w")
 for element in history_vae:

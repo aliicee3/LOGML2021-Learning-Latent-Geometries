@@ -60,7 +60,7 @@ def fit_epoch_vae(model, train_x, optimizer, batch_size, is_cnn=False, device = 
         inputs = inputs.to(device)
         # Forward Pass
         reconstructed_x, mu, log_var = model.forward(inputs)
-        loss = vae_loss(reconstructed_x, inputs, mu, log_var, 1e-5)
+        loss = vae_loss(reconstructed_x, inputs, mu, log_var, 1e-4)
         
         # Backpropagation
         optimizer.zero_grad()
@@ -91,8 +91,8 @@ def train_vae(train_x, model, epochs=10, batch_size=32, lr=0.001, device = 'cuda
             pbar_outer.update(1)
             tqdm.write(log_template.format(ep=epoch+1, t_loss=train_loss))
             if epoch % 50 == 0:
-                torch.save(model.state_dict(), "weights/%s_Model.pt" %epoch)
+                torch.save(model.state_dict(), "weights/%s_Model_b.pt" %epoch)
         
     
-    torch.save(model.state_dict(), "weights/finalModel.pt")
+    torch.save(model.state_dict(), "weights/finalModel_b.pt")
     return history
